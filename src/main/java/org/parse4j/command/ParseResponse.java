@@ -1,10 +1,11 @@
 package org.parse4j.command;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parse4j.ParseException;
@@ -123,6 +124,20 @@ public class ParseResponse {
 	}
 	
 	private String getResponseAsString(HttpResponse httpResponse) {
+		String jsonText = null;
+		try {
+			HttpEntity entity = httpResponse.getEntity();
+			jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
+			
+		} catch (org.apache.http.ParseException e) {
+			LOGGER.error("Error while reading response entity", e);
+			throw new IllegalArgumentException("Failed getting Parse Response", e);
+		} catch (IOException e) {
+			LOGGER.error("Error while reading response entity", e);
+			throw new IllegalArgumentException("Failed getting Parse Response", e);
+		}
+		return jsonText;
+		/*
 		try {
 			BufferedReader r = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
 			StringBuilder total = new StringBuilder();
@@ -137,6 +152,8 @@ public class ParseResponse {
 			LOGGER.error("Error while reading response entity", e);
 			throw new IllegalArgumentException("Failed getting Parse Response", e);
 		}
+		*/
+		
 	}
 
 }
